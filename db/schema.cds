@@ -1,17 +1,25 @@
 namespace utadeo.nextnest;
 
 entity country {
+    key id          : Integer;
+        name        : String(50) not null;
+        preffix     : String(10) not null;
+        departments : Association to many department
+                          on departments.country = $self;
+}
+
+entity department {
     key id      : Integer;
         name    : String(50) not null;
-        preffix : String(10) not null;
+        country : Association to country;
         cities  : Association to many city
-                      on cities.country = $self;
+                      on cities.department = $self;
 }
 
 entity city {
     key id            : Integer;
         name          : String(50) not null;
-        country       : Association to country;
+        department    : Association to department;
         living_places : Association to many living_place
                             on living_places.city = $self;
 }

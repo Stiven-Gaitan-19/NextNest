@@ -2,6 +2,7 @@ using utadeo.nextnest as schema from '../db/schema';
 
 service ApiServices {
     entity Countries as projection on schema.country;
+    entity Departments as projection on schema.department;
     entity Cities as projection on schema.city;
     entity Users as projection on schema.user;
     entity TypePosts as projection on schema.type_post;
