@@ -1,0 +1,59 @@
+## Generated mta.yaml based on template version 0.4.0
+## appName = portal-gastos
+## language=nodejs; multitenant=false
+## approuter=
+_schema-version: "3.1"
+ID: portal-gastos
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx -p @sap/cds-dk cds build --production
+
+modules:
+  # --------------------- SERVER MODULE ------------------------
+  - name: test-app-srv
+    # ------------------------------------------------------------
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 256M
+    requires:
+      - name: test-app-db
+    build-parameters:
+      ignore:
+        - "package-lock.json"
+        - "node_modules/"
+      builder: npm-ci
+
+  # -------------------- SIDECAR MODULE ------------------------
+  - name: test-app-db-deployer
+    # ------------------------------------------------------------
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      # 'hana' and 'xsuaa' resources extracted from CAP configuration
+      - name: test-app-db
+
+resources:
+  # services extracted from CAP configuration
+  # 'service-plan' can be configured via 'cds.requires.<name>.vcap.plan'
+  # ------------------------ DB SERVICE --------------------------
+  - name: test-app-db
+    # ------------------------------------------------------------
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana # or 'hanatrial' on trial landscapes
+      service-plan: hdi-shared
+    properties:
+      hdi-service-name: ${service-name}
